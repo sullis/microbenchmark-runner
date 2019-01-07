@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2019 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -12,6 +12,10 @@ package jmh.mbr.junit5.descriptor;
 import java.util.Collections;
 import java.util.Set;
 
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.engine.extension.ExtensionRegistry;
+import org.junit.platform.engine.ConfigurationParameters;
+import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.TestTag;
 import org.junit.platform.engine.UniqueId;
@@ -22,7 +26,7 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
 /**
  * Abstract base class for Benchmark descriptors.
  */
-abstract class AbstractBenchmarkDescriptor extends AbstractTestDescriptor {
+public abstract class AbstractBenchmarkDescriptor extends AbstractTestDescriptor {
 
 	private final Set<TestTag> tags;
 
@@ -48,4 +52,8 @@ abstract class AbstractBenchmarkDescriptor extends AbstractTestDescriptor {
 	public Set<TestTag> getTags() {
 		return tags;
 	}
+
+	public abstract ExtensionContext getExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, ConfigurationParameters configurationParameters);
+
+	public abstract ExtensionRegistry getExtensionRegistry(ExtensionRegistry parent);
 }
