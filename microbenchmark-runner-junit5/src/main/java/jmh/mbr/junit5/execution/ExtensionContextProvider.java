@@ -66,17 +66,16 @@ class ExtensionContextProvider implements AutoCloseable {
 	@Override
 	public void close() {
 
-		for (ExtensionContext value : contextMap.values()) {
-
-			if (!(value instanceof Closeable)) {
-				continue;
-			}
-
-			try {
-				((Closeable) value).close();
-			} catch (IOException e) {
-				logger.error(e, () -> String.format("Cannot close context [%s]", value));
-			}
-		}
+		contextMap.values()
+				.stream()
+				.filter(Closeable.class::isInstance)
+				.map(Closeable.class::cast)
+				.forEach(closeable -> {
+					try {
+						closeable.close();
+					} catch (IOException e) {
+						logger.error(e, () -> String.format("Cannot close context [%s]", closeable));
+					}
+				});
 	}
 }

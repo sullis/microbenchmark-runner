@@ -18,16 +18,17 @@ import jmh.mbr.core.model.BenchmarkClass;
 import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledOnOs;
-import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
+import org.junit.jupiter.api.extension.ExecutionCondition;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.UniqueId;
 import org.openjdk.jmh.annotations.Benchmark;
 
 /**
- * @author Mark Paluch
+ * Unit tests for {@link ConditionEvaluator}.
  */
 public class ConditionEvaluatorUnitTests {
 
@@ -62,17 +63,14 @@ public class ConditionEvaluatorUnitTests {
 
 		ExtensionRegistry parentRegistry = ExtensionRegistry.createRegistryWithDefaultExtensions(EmptyConfigurationParameters.INSTANCE);
 
-		BenchmarkClassDescriptor descriptor = createDescriptor(AixBenchmark.class);
+		BenchmarkClassDescriptor descriptor = createDescriptor(CustomExtensionBenchmark.class);
 		ExtensionRegistry registry = descriptor.getExtensionRegistry(parentRegistry);
 
 		ConditionEvaluator evaluator = new ConditionEvaluator();
 		ConditionEvaluationResult result = evaluator.evaluate(registry, descriptor.getExtensionContext(null, null, EmptyConfigurationParameters.INSTANCE));
 
 		assertThat(result.isDisabled()).isTrue();
-		assertThat(result.getReason()).hasValueSatisfying(actual -> {
-
-			assertThat(actual).startsWith("Disabled on operating system");
-		});
+		assertThat(result.getReason()).contains("always disabled");
 	}
 
 	private BenchmarkClassDescriptor createDescriptor(Class<?> javaClass) {
@@ -96,8 +94,8 @@ public class ConditionEvaluatorUnitTests {
 		}
 	}
 
-	@EnabledOnOs(OS.AIX) // let's hope this test is never executed on AIX
-	public static class AixBenchmark {
+	@ExtendWith(NeverRunExtension.class)
+	public static class CustomExtensionBenchmark {
 
 		@Benchmark
 		public void justOne() {
@@ -120,6 +118,14 @@ public class ConditionEvaluatorUnitTests {
 		@Override
 		public int size() {
 			return 0;
+		}
+	}
+
+	static class NeverRunExtension implements ExecutionCondition {
+
+		@Override
+		public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
+			return ConditionEvaluationResult.disabled("always disabled");
 		}
 	}
 }

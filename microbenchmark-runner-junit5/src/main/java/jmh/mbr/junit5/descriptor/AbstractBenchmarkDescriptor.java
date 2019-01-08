@@ -24,12 +24,19 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 import org.junit.platform.engine.support.descriptor.MethodSource;
 
 /**
- * Abstract base class for Benchmark descriptors.
+ * Abstract base class for Benchmark descriptors. Exposes {@link TestTag tags} and allows contextual {@link org.junit.jupiter.api.extension.Extension} retrieval.
  */
 public abstract class AbstractBenchmarkDescriptor extends AbstractTestDescriptor {
 
 	private final Set<TestTag> tags;
 
+	/**
+	 * Creates a new {@link AbstractBenchmarkDescriptor} given {@link UniqueId}, {@code displayName} and a {@link TestSource}.
+	 *
+	 * @param uniqueId the {@link UniqueId} for this descriptor.
+	 * @param displayName
+	 * @param source source this descriptor.
+	 */
 	public AbstractBenchmarkDescriptor(UniqueId uniqueId, String displayName, TestSource source) {
 		super(uniqueId, displayName, source);
 
@@ -53,7 +60,21 @@ public abstract class AbstractBenchmarkDescriptor extends AbstractTestDescriptor
 		return tags;
 	}
 
+	/**
+	 * Creates a {@link ExtensionContext} for this descriptor containing scoped extensions.
+	 *
+	 * @param parent optional parent {@link ExtensionContext}. {@literal null} to use no parent so the resulting context serves as root {@link ExtensionContext}.
+	 * @param engineExecutionListener the listener.
+	 * @param configurationParameters configuration  parameters.
+	 * @return the {@link ExtensionContext} for this descriptor.
+	 */
 	public abstract ExtensionContext getExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, ConfigurationParameters configurationParameters);
 
+	/**
+	 * Creates an {@link ExtensionRegistry} that contains extensions derived from the benchmark source (annotations on class/method level).
+	 *
+	 * @param parent the parent {@link ExtensionRegistry}.
+	 * @return the {@link ExtensionRegistry} derived from this descriptor.
+	 */
 	public abstract ExtensionRegistry getExtensionRegistry(ExtensionRegistry parent);
 }

@@ -20,8 +20,6 @@ import org.junit.platform.engine.EngineExecutionListener;
 
 /**
  * {@link ExtensionContext} for a {@link BenchmarkClassDescriptor}.
- *
- * @author Mark Paluch
  */
 class BenchmarkClassExtensionContext extends AbstractExtensionContext<BenchmarkClassDescriptor> {
 

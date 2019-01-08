@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2015-2019 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.engine.execution.ExtensionValuesStore;
 import org.junit.jupiter.engine.execution.NamespaceAwareStore;
-import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
@@ -43,20 +42,15 @@ abstract class AbstractExtensionContext<T extends TestDescriptor> implements Ext
 	AbstractExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, T benchmarkDescriptor,
 							 ConfigurationParameters configurationParameters) {
 
-		Preconditions.notNull(benchmarkDescriptor, "TestDescriptor must not be null");
-		Preconditions.notNull(configurationParameters, "ConfigurationParameters must not be null");
-
 		this.parent = parent;
 		this.engineExecutionListener = engineExecutionListener;
 		this.benchmarkDescriptor = benchmarkDescriptor;
 		this.configurationParameters = configurationParameters;
 		this.valuesStore = createStore(parent);
 
-		// @formatter:off
 		this.tags = benchmarkDescriptor.getTags().stream()
 				.map(TestTag::getName)
 				.collect(Collectors.collectingAndThen(Collectors.toCollection(LinkedHashSet::new), Collections::unmodifiableSet));
-		// @formatter:on
 	}
 
 	private ExtensionValuesStore createStore(ExtensionContext parent) {
@@ -100,13 +94,12 @@ abstract class AbstractExtensionContext<T extends TestDescriptor> implements Ext
 		return this;
 	}
 
-	protected T getBenchmarkDescriptor() {
+	T getBenchmarkDescriptor() {
 		return this.benchmarkDescriptor;
 	}
 
 	@Override
 	public Store getStore(Namespace namespace) {
-		Preconditions.notNull(namespace, "Namespace must not be null");
 		return new NamespaceAwareStore(this.valuesStore, namespace);
 	}
 

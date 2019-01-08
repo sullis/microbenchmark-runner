@@ -46,7 +46,7 @@ public class BenchmarkFixtureDescriptor extends AbstractBenchmarkDescriptor {
 	}
 
 	@Override
-	public AbstractExtensionContext<?> getExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, ConfigurationParameters configurationParameters) {
+	public ExtensionContext getExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, ConfigurationParameters configurationParameters) {
 		throw new UnsupportedOperationException();
 	}
 

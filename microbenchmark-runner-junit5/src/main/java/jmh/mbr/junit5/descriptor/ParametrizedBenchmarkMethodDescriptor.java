@@ -63,7 +63,7 @@ public class ParametrizedBenchmarkMethodDescriptor extends AbstractBenchmarkDesc
 	}
 
 	@Override
-	public AbstractExtensionContext<?> getExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, ConfigurationParameters configurationParameters) {
+	public ExtensionContext getExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, ConfigurationParameters configurationParameters) {
 		return new BenchmarkMethodExtensionContext(parent, engineExecutionListener, this, configurationParameters);
 	}
 

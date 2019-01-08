@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -163,47 +162,49 @@ public class JmhRunner {
 		}).map(AbstractBenchmarkDescriptor.class::cast).collect(Collectors.toList());
 	}
 
-	private List<String> evaluateBenchmarksToRun(List<AbstractBenchmarkDescriptor> includes, EngineExecutionListener listener) {
+	List<String> evaluateBenchmarksToRun(List<AbstractBenchmarkDescriptor> includes, EngineExecutionListener listener) {
 
 		try (ExtensionContextProvider contextProvider = ExtensionContextProvider.create(listener, configurationParameters)) {
 
 			List<String> includePatterns = new ArrayList<>();
 
-			for (AbstractBenchmarkDescriptor descriptor : includes) {
+			includes.stream()
+					.filter(BenchmarkClassDescriptor.class::isInstance)
+					.map(BenchmarkClassDescriptor.class::cast)
+					.forEach(descriptor -> {
 
-				if (descriptor instanceof BenchmarkClassDescriptor) {
+						ExtensionContext classExtensionContext = contextProvider.getExtensionContext(descriptor);
+						List<String> methodIncludePatterns = new ArrayList<>();
 
-					ExtensionContext classExtensionContext = contextProvider.getExtensionContext((BenchmarkClassDescriptor) descriptor);
-					List<String> methodIncludePatterns = new ArrayList<>();
+						SkipResult shouldRun = shouldRun(classExtensionContext, descriptor, listener);
 
-					SkipResult shouldRun = shouldRun(classExtensionContext, descriptor, listener);
+						if (shouldRun.isSkipped()) {
+							listener.executionSkipped(descriptor, shouldRun.getReason().get());
+							return;
+						}
 
-					if (shouldRun.isSkipped()) {
-						listener.executionSkipped(descriptor, shouldRun.getReason().get());
-						continue;
-					}
+						descriptor.accept(it -> {
+							if (it instanceof MethodAware) {
+								shouldRun(classExtensionContext, (MethodAware) it, listener).includeIfEnabled(methodIncludePatterns);
+							}
+						});
 
-					descriptor.accept(it -> {
-						if (it instanceof MethodAware) {
-							shouldRun(classExtensionContext, (MethodAware) descriptor, listener).includeIfEnabled(methodIncludePatterns);
+						if (methodIncludePatterns.isEmpty()) {
+							listener.executionSkipped(descriptor, "No methods to run");
+						} else {
+							includePatterns.addAll(methodIncludePatterns);
 						}
 					});
 
-					if (methodIncludePatterns.isEmpty()) {
-						listener.executionSkipped(descriptor, "No methods to run");
-					} else {
-						includePatterns.addAll(methodIncludePatterns);
-					}
-				}
+			includes.stream()
+					.filter(MethodAware.class::isInstance)
+					.forEach(descriptor -> {
+						ExtensionContext parentContext = contextProvider.getExtensionContext(descriptor.getParent());
+						shouldRun(parentContext, (MethodAware) descriptor, listener).includeIfEnabled(includePatterns);
+					});
 
-				if (descriptor instanceof MethodAware) {
-					ExtensionContext parentContext = contextProvider.getExtensionContext(descriptor.getParent());
-					shouldRun(parentContext, (MethodAware) descriptor, listener).includeIfEnabled(includePatterns);
-				}
-			}
+			return includePatterns;
 		}
-
-		return Collections.emptyList();
 	}
 
 	private SkipResult shouldRun(ExtensionContext parent, AbstractBenchmarkDescriptor descriptor, EngineExecutionListener listener) {
@@ -224,18 +225,19 @@ public class JmhRunner {
 		AbstractBenchmarkDescriptor descriptor = (AbstractBenchmarkDescriptor) methodAware;
 		SkipResult skipResult = shouldRun(parent, descriptor, listener);
 
-		return new ConditionalExecution(skipResult, descriptor, methodAware);
+		return new ConditionalExecution(skipResult, methodAware);
 	}
 
+	/**
+	 * Value object representing the outcome of condition evaluation for a benchmark method.
+	 */
 	static class ConditionalExecution {
 
 		private final SkipResult skipResult;
-		private final AbstractBenchmarkDescriptor descriptor;
 		private final MethodAware methodAware;
 
-		private ConditionalExecution(SkipResult skipResult, AbstractBenchmarkDescriptor descriptor, MethodAware methodAware) {
+		private ConditionalExecution(SkipResult skipResult, MethodAware methodAware) {
 			this.skipResult = skipResult;
-			this.descriptor = descriptor;
 			this.methodAware = methodAware;
 		}
 
@@ -246,7 +248,6 @@ public class JmhRunner {
 			}
 		}
 	}
-
 
 	/**
 	 * {@link OutputFormat} that delegates to another {@link OutputFormat} and notifies {@link RunNotifier} about the

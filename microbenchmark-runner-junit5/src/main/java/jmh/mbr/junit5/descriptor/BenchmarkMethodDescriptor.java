@@ -55,7 +55,7 @@ public class BenchmarkMethodDescriptor extends AbstractBenchmarkDescriptor imple
 	}
 
 	@Override
-	public AbstractExtensionContext<?> getExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, ConfigurationParameters configurationParameters) {
+	public ExtensionContext getExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener, ConfigurationParameters configurationParameters) {
 		return new BenchmarkMethodExtensionContext(parent, engineExecutionListener, this, configurationParameters);
 	}
 

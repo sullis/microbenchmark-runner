@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 the original author or authors.
+ * Copyright 2015-2019 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -20,9 +20,7 @@ import org.junit.platform.commons.logging.LoggerFactory;
 import org.junit.platform.commons.util.StringUtils;
 
 /**
- * Evaluates conditions for a benchmark class.
- *
- * @author Mark Paluch
+ * Evaluates conditions for a benchmark class/benchmark method.
  */
 class ConditionEvaluator {
 
@@ -76,9 +74,7 @@ class ConditionEvaluator {
 	}
 
 	/**
-	 * Exception thrown on failures while evaluationg an {@link ExecutionCondition}.
-	 *
-	 * @author Mark Paluch
+	 * Exception thrown on failures while evaluating an {@link ExecutionCondition}.
 	 */
 	static class ConditionEvaluationException extends RuntimeException {
 

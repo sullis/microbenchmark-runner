@@ -21,8 +21,6 @@ import org.junit.platform.engine.EngineExecutionListener;
 
 /**
  * {@link ExtensionContext} for a {@link AbstractBenchmarkDescriptor} that is {@link MethodAware}.
- *
- * @author Mark Paluch
  */
 class BenchmarkMethodExtensionContext extends AbstractExtensionContext<AbstractBenchmarkDescriptor> {
 
@@ -47,7 +45,6 @@ class BenchmarkMethodExtensionContext extends AbstractExtensionContext<AbstractB
 	public Optional<Lifecycle> getTestInstanceLifecycle() {
 		return Optional.empty();
 	}
-
 
 	@Override
 	public Optional<Object> getTestInstance() {
