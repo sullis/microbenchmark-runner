@@ -22,6 +22,8 @@ import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.UniqueId;
@@ -35,7 +37,7 @@ public class ConditionEvaluatorUnitTests {
 	@Test
 	void shouldRunWithoutCondition() {
 
-		ExtensionRegistry registry = ExtensionRegistry.createRegistryWithDefaultExtensions(EmptyConfigurationParameters.INSTANCE);
+		ExtensionRegistry registry = ExtensionRegistry.createRegistryWithDefaultExtensions(EmptyConfigurationParameters.INSTANCE.toConfiguration());
 
 		BenchmarkClassDescriptor descriptor = createDescriptor(SimpleBenchmarkClass.class);
 
@@ -48,7 +50,7 @@ public class ConditionEvaluatorUnitTests {
 	@Test
 	void shouldSkipDisabledBenchmarkClass() {
 
-		ExtensionRegistry registry = ExtensionRegistry.createRegistryWithDefaultExtensions(EmptyConfigurationParameters.INSTANCE);
+		ExtensionRegistry registry = ExtensionRegistry.createRegistryWithDefaultExtensions(EmptyConfigurationParameters.INSTANCE.toConfiguration());
 
 		BenchmarkClassDescriptor descriptor = createDescriptor(DisabledBenchmark.class);
 
@@ -61,7 +63,7 @@ public class ConditionEvaluatorUnitTests {
 	@Test
 	void shouldSkipDisabledThroughExtensionClass() {
 
-		ExtensionRegistry parentRegistry = ExtensionRegistry.createRegistryWithDefaultExtensions(EmptyConfigurationParameters.INSTANCE);
+		ExtensionRegistry parentRegistry = ExtensionRegistry.createRegistryWithDefaultExtensions(EmptyConfigurationParameters.INSTANCE.toConfiguration());
 
 		BenchmarkClassDescriptor descriptor = createDescriptor(CustomExtensionBenchmark.class);
 		ExtensionRegistry registry = descriptor.getExtensionRegistry(parentRegistry);
@@ -118,6 +120,10 @@ public class ConditionEvaluatorUnitTests {
 		@Override
 		public int size() {
 			return 0;
+		}
+
+		public JupiterConfiguration toConfiguration() {
+			return new DefaultJupiterConfiguration(this);
 		}
 	}
 

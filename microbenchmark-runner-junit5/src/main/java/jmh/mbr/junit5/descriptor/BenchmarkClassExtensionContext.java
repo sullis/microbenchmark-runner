@@ -10,10 +10,8 @@
 package jmh.mbr.junit5.descriptor;
 
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Method;
 import java.util.Optional;
 
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
@@ -37,24 +35,4 @@ class BenchmarkClassExtensionContext extends AbstractExtensionContext<BenchmarkC
 		return Optional.of(getBenchmarkDescriptor().getJavaClass());
 	}
 
-	@Override
-	public Optional<Lifecycle> getTestInstanceLifecycle() {
-		return Optional.empty();
-	}
-
-
-	@Override
-	public Optional<Object> getTestInstance() {
-		return Optional.empty();
-	}
-
-	@Override
-	public Optional<Method> getTestMethod() {
-		return Optional.empty();
-	}
-
-	@Override
-	public Optional<Throwable> getExecutionException() {
-		return Optional.empty();
-	}
 }

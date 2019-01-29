@@ -25,6 +25,8 @@ import jmh.mbr.junit5.descriptor.BenchmarkClassDescriptor;
 import jmh.mbr.junit5.descriptor.BenchmarkMethodDescriptor;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
@@ -39,7 +41,7 @@ import org.openjdk.jmh.annotations.Benchmark;
  */
 public class JmhRunnerUnitTests {
 
-	JmhRunner runner = new JmhRunner(EmptyConfigurationParameters.INSTANCE, ExtensionRegistry.createRegistryWithDefaultExtensions(EmptyConfigurationParameters.INSTANCE));
+	JmhRunner runner = new JmhRunner(EmptyConfigurationParameters.INSTANCE, ExtensionRegistry.createRegistryWithDefaultExtensions(EmptyConfigurationParameters.INSTANCE.toConfiguration()));
 
 	@Test
 	void shouldIncludeUnconditionalBenchmarkClass() {
@@ -144,6 +146,10 @@ public class JmhRunnerUnitTests {
 		@Override
 		public int size() {
 			return 0;
+		}
+
+		public JupiterConfiguration toConfiguration() {
+			return new DefaultJupiterConfiguration(this);
 		}
 	}
 
